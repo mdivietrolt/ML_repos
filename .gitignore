@@ -308,4 +308,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+wandb
+CIFAR10
+FashionMNIST
+MNIST
+
 # End of https://www.toptal.com/developers/gitignore/api/python,data,images,macos,windows

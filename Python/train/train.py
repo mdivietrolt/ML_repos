@@ -26,7 +26,7 @@ def trainModel(model, device, BATCH_SIZE, criterion, optimizer, num_epochs, trai
     val_acc = []
     train_loss = []
     train_acc = []
-    lr = [] #learning rate
+    lr = 0.0 #[] #learning rate
     total_step = len(trainloader)
     for epoch in range(num_epochs):
         model.train()
@@ -34,6 +34,11 @@ def trainModel(model, device, BATCH_SIZE, criterion, optimizer, num_epochs, trai
         accura = 0
         correct = 0
         total=0
+        
+        optimizer.zero_grad()
+        optimizer.step()
+        
+           
         for i, data in enumerate(trainloader, 1):
             inputs, labels = data
             inputs, labels = inputs.to(device), labels.to(device) 
@@ -45,9 +50,13 @@ def trainModel(model, device, BATCH_SIZE, criterion, optimizer, num_epochs, trai
             loss.backward()
             optimizer.step()
 
+
             # Record & update learning rate
-            lr.append(get_lr(optimizer))
+            #lr.append(get_lr(optimizer))
             sched.step()
+            lr = sched.get_last_lr()[0] #fix in wandbi
+            print(lr)
+          
 
             _, predicted_classes = torch.max(outputs, 1)
             accura += (predicted_classes == labels).sum().item()
@@ -63,13 +72,14 @@ def trainModel(model, device, BATCH_SIZE, criterion, optimizer, num_epochs, trai
         print("TRAIN ACCURACY : {:.2f}".format(accuracy))
         train_acc.append(100 * correct / total)
         train_loss.append(running_loss/total_step)
-        print(f'train-loss: {np.mean(train_loss):.4f}, train-acc: {(100 * correct/total):.4f}')
+        #print(f'train-loss: {np.mean(train_loss):.4f}, train-acc: {(100 * correct/total):.4f}')
         wandb.log(
             {
                 "TRAIN LOSS" : running_loss/i,
                 "TRAIN ACCURACY" : accuracy,
-                "train-loss:" : train_loss,
-                "train-acc" : (100 * correct/total)
+                #"train-loss:" : train_loss,
+                #"train-acc" : (100 * correct/total),
+                "learning rate" : lr
             }
             
         )
